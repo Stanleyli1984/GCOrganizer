@@ -5,7 +5,7 @@ package com.example.stanl.gcorganizer;
  */
 import android.content.ContentValues;
 import android.content.Context;
-import android.database.Cursor;
+import net.sqlcipher.Cursor;
 import net.sqlcipher.database.SQLiteDatabase;
 import net.sqlcipher.database.SQLiteOpenHelper;
 import java.util.ArrayList;
@@ -16,12 +16,12 @@ import java.util.List;
 public class DBHandler extends SQLiteOpenHelper {
     // If you change the database schema, you must increment the database version.
     public static final String PWD = "Password";
-    public static final int DATABASE_VERSION = 6;
+    public static final int DATABASE_VERSION = 7;
     public static final String DATABASE_NAME = "FeedReader1.db";
     // Contacts table name
     private static final String TABLE_CARDS = "shops";
     // Shops Table Columns names
-    private static final String CARD_ID = "id";
+    private static final String CARD_ID = "_id";
     private static final String CARD_NUMBER = "card_number";
     private static final String STORE_NAME = "store_name";
     private static final String STORE_ID = "store_id";
@@ -98,4 +98,18 @@ public class DBHandler extends SQLiteOpenHelper {
         cursor.close();
         return shopList;
     }
+
+    public Cursor getAllCursor() {
+        // Select All Query
+        String selectQuery = "SELECT * FROM " + TABLE_CARDS;
+        SQLiteDatabase db = this.getReadableDatabase(PWD);
+        Cursor cursor = db.rawQuery(selectQuery, null);
+
+        if (cursor != null) {
+            cursor.moveToFirst();
+        }
+
+        return cursor;
+    }
+
 }

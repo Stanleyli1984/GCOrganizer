@@ -3,7 +3,7 @@ package com.example.stanl.gcorganizer;
 import android.content.Intent;
 import android.os.Bundle;
 import android.support.design.widget.FloatingActionButton;
-import android.support.design.widget.Snackbar;
+import android.support.v4.widget.SimpleCursorAdapter;
 import android.view.View;
 import android.support.design.widget.NavigationView;
 import android.support.v4.view.GravityCompat;
@@ -13,9 +13,12 @@ import android.support.v7.app.AppCompatActivity;
 import android.support.v7.widget.Toolbar;
 import android.view.Menu;
 import android.view.MenuItem;
+import android.widget.AdapterView;
 import android.widget.EditText;
 import android.widget.ListView;
+import android.widget.AdapterView.OnItemClickListener;
 
+import net.sqlcipher.Cursor;
 import net.sqlcipher.database.SQLiteDatabase;
 
 import java.util.List;
@@ -23,6 +26,10 @@ import java.util.List;
 public class MainActivity extends AppCompatActivity
         implements NavigationView.OnNavigationItemSelectedListener {
     public final static String EXTRA_MESSAGE = "com.mycompany.myfirstapp.MESSAGE";
+
+    private SimpleCursorAdapter dataAdapter;
+    private DBHandler dbHelper;
+
     @Override
     protected void onCreate(Bundle savedInstanceState) {
         super.onCreate(savedInstanceState);
@@ -57,22 +64,49 @@ public class MainActivity extends AppCompatActivity
 
         NavigationView navigationView = (NavigationView) findViewById(R.id.nav_view);
         navigationView.setNavigationItemSelectedListener(this);
+        dbHelper = new DBHandler(this);
         display_table();
     }
 
     private void display_table() {
         ListView tl = (ListView) findViewById(R.id.main_table);
-        List<Card> cards = (new DBHandler(this)).list();
-        tl.setAdapter(new GCAdaptor(this, cards));
-//        lv1.setOnItemClickListener(new OnItemClickListener() {
-//
-//            @Override
-//            public void onItemClick(AdapterView<?> a, View v, int position, long id) {
-//                Object o = lv1.getItemAtPosition(position);
-//                NewsItem newsData = (NewsItem) o;
-//                Toast.makeText(MainActivity.this, "Selected :" + " " + newsData, Toast.LENGTH_LONG).show();
-//            }
-//        });
+        // Need to be the same as the column names in DB
+        String[] columns = new String[] {
+                "card_number",
+                "store_name"
+        };
+
+        // the XML defined views which the data will be bound to
+        int[] to = new int[] {
+                R.id.card_number,
+                R.id.store_name,
+        };
+
+        dataAdapter = new SimpleCursorAdapter(
+                this, R.layout.dis_card_row_layout,
+                dbHelper.getAllCursor(),
+                columns,
+                to,
+                0);
+
+        tl.setAdapter(dataAdapter);
+
+        tl.setOnItemClickListener(new OnItemClickListener() {
+            @Override
+            public void onItemClick(AdapterView<?> listView, View view,
+                                    int position, long id) {
+                // Get the cursor, positioned to the corresponding row in the result set
+                Cursor cursor = (Cursor) listView.getItemAtPosition(position);
+
+                // Get the state's capital from this row in the database.
+                //String countryCode =
+                //        cursor.getString(cursor.getColumnIndexOrThrow("code"));
+                //Toast.makeText(getApplicationContext(),
+                  //      countryCode, Toast.LENGTH_SHORT).show();
+
+            }
+        });
+
     }
 
     @Override
