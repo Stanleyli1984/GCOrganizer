@@ -72,6 +72,19 @@ public class DBHandler extends SQLiteOpenHelper {
         db.close(); // Closing database connection
     }
 
+    public void update(ContentValues values) {
+        SQLiteDatabase db = this.getWritableDatabase(PWD);
+        //for (Field field : card.getClass().getDeclaredFields()) {
+        //    if (field.get(card) != null) {
+        //        field.setAccessible(true); //Additional line
+        //        values.put(field.getName(), field.get(card));
+        //    }
+        //}
+        db.update(TABLE_CARDS, values, CARD_ID + " = ?",
+                new String[] { String.valueOf(values.get(CARD_ID))});
+        db.close(); // Closing database connection
+    }
+
     public List<Card> list() {
         List<Card> shopList = new ArrayList<Card>();
         // Select All Query

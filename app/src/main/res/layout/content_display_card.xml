@@ -19,27 +19,14 @@
         tools:showIn="@layout/activity_add_card"
         tools:context="com.example.stanl.gcorganizer.AddCardActivity"
         android:orientation="vertical">
-        <TextView android:id="@+id/text1"
-            android:layout_weight="1"
-            android:layout_width="fill_parent"
-            android:hint="Please fill in information below:"
-            android:textSize="20sp"
-            android:layout_height="0dp"/>
 
-        <include layout="@layout/add_info_row_general" android:id="@+id/edit_card_number" />
-        <include layout="@layout/add_info_row_general" android:id="@+id/edit_store_name" />
+        <include layout="@layout/dis_info_row_general" android:id="@+id/dis_card_number" />
+        <include layout="@layout/dis_info_row_general" android:id="@+id/dis_store_name" />
 
-        <Button android:id="@+id/addbutton"
+        <Button
             android:layout_width="wrap_content"
             android:layout_height="wrap_content"
-            android:onClick="AddCard"
-            android:text="@string/button_addcard" />
-
-        <Button android:id="@+id/updatebutton"
-            android:layout_width="wrap_content"
-            android:layout_height="wrap_content"
-            android:onClick="UpdateCard"
-            android:text="@string/button_updatecard" />
-
+            android:onClick="EditCard"
+            android:text="@string/button_editcard" />
     </LinearLayout>
 </ScrollView>

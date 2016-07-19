@@ -8,6 +8,8 @@
     <string name="title_activity_display_message">My Message</string>
     <string name="title_activity_add_card">AddCardActivity</string>
     <string name="button_addcard">Add This Card!</string>
+    <string name="button_updatecard">Update This Card!</string>
+    <string name="button_editcard">Edit This Card</string>
     <string name="add_card_number">Card number (E.g. "003 01-3")</string>
     <string name="add_store_name">Name of store (E.g. "Best Buy")</string>
 </resources>

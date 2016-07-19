@@ -15,7 +15,6 @@ import android.support.design.widget.NavigationView;
 import android.support.v4.view.GravityCompat;
 import android.support.v4.widget.DrawerLayout;
 import android.support.v7.app.ActionBarDrawerToggle;
-import android.support.v7.app.AppCompatActivity;
 import android.support.v7.widget.Toolbar;
 import android.view.Menu;
 import android.view.MenuItem;
@@ -30,8 +29,6 @@ import android.widget.AdapterView.OnItemClickListener;
 
 //import net.sqlcipher.Cursor;
 import net.sqlcipher.database.SQLiteDatabase;
-
-import java.util.List;
 
 public class MainActivity extends FragmentActivity
 implements NavigationView.OnNavigationItemSelectedListener, LoaderManager.LoaderCallbacks<Cursor> {
@@ -90,7 +87,7 @@ implements NavigationView.OnNavigationItemSelectedListener, LoaderManager.Loader
         };
 
         dataAdapter = new SimpleCursorAdapter(
-                this, R.layout.dis_card_row_layout,
+                this, R.layout.main_dis_card_row_layout,
                 null,
                 columns,
                 to,
@@ -104,7 +101,15 @@ implements NavigationView.OnNavigationItemSelectedListener, LoaderManager.Loader
                                     int position, long id) {
                 // Get the cursor, positioned to the corresponding row in the result set
                 Cursor cursor = (Cursor) listView.getItemAtPosition(position);
-
+                Card card = new Card();
+                card._id = cursor.getInt(cursor.getColumnIndexOrThrow("_id"));
+                card.card_number = cursor.getString(cursor.getColumnIndexOrThrow(DBHandler.CARD_NUMBER));
+                card.store_name = cursor.getString(cursor.getColumnIndexOrThrow(DBHandler.STORE_NAME));
+                Intent intent = new Intent(getApplicationContext(), DisplayCardActivity.class);
+                Bundle bundle = new Bundle();
+                bundle.putParcelable("Card", card);
+                intent.putExtra(EXTRA_MESSAGE, bundle);
+                startActivity(intent);
                 // Get the state's capital from this row in the database.
                 //String countryCode =
                 //        cursor.getString(cursor.getColumnIndexOrThrow("code"));
@@ -128,13 +133,12 @@ implements NavigationView.OnNavigationItemSelectedListener, LoaderManager.Loader
         Uri.Builder builder = new Uri.Builder();
         builder.scheme("content").authority(MyContentProvider.AUTHORITY).appendPath("shops");
 
-        CursorLoader tmp = new CursorLoader(this,
+        return new CursorLoader(this,
                 builder.build(),
                 null,
                 null,
                 null,
                 null);
-        return tmp;
     }
 
     public void onLoaderReset(Loader<Cursor> loader) {

@@ -41,7 +41,7 @@ public class DisplayMessageActivity extends AppCompatActivity {
         values.put(DBHandler.CARD_NUMBER, intent.getStringExtra("card_number"));
         getContentResolver().insert(MyContentProvider.CONTENT_URI, values);
         textView.setText("Succeed!");
-        RelativeLayout layout = (RelativeLayout) findViewById(R.id.content);
-        layout.addView(textView);
+//        RelativeLayout layout = (RelativeLayout) findViewById(R.id.content);
+  //      layout.addView(textView);
     }
 }
