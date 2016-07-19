@@ -5,7 +5,7 @@ package com.example.stanl.gcorganizer;
  */
 import android.content.ContentValues;
 import android.content.Context;
-import net.sqlcipher.Cursor;
+import android.database.Cursor;
 import net.sqlcipher.database.SQLiteDatabase;
 import net.sqlcipher.database.SQLiteOpenHelper;
 import java.util.ArrayList;
@@ -19,18 +19,18 @@ public class DBHandler extends SQLiteOpenHelper {
     public static final int DATABASE_VERSION = 7;
     public static final String DATABASE_NAME = "FeedReader1.db";
     // Contacts table name
-    private static final String TABLE_CARDS = "shops";
+    public static final String TABLE_CARDS = "shops";
     // Shops Table Columns names
-    private static final String CARD_ID = "_id";
-    private static final String CARD_NUMBER = "card_number";
-    private static final String STORE_NAME = "store_name";
-    private static final String STORE_ID = "store_id";
-    private static final String CARD_EXP_MONTH = "exp_month";
-    private static final String CARD_EXP_YEAR = "exp_year";
-    private static final String CARD_NOTE = "note";
-    private static final String CARD_THUMB = "thumb";
-    private static final String CARD_PIC1 = "pic1";
-    private static final String CARD_PIC2 = "pic2";
+    public static final String CARD_ID = "_id";
+    public static final String CARD_NUMBER = "card_number";
+    public static final String STORE_NAME = "store_name";
+    public static final String STORE_ID = "store_id";
+    public static final String CARD_EXP_MONTH = "exp_month";
+    public static final String CARD_EXP_YEAR = "exp_year";
+    public static final String CARD_NOTE = "note";
+    public static final String CARD_THUMB = "thumb";
+    public static final String CARD_PIC1 = "pic1";
+    public static final String CARD_PIC2 = "pic2";
 
     public DBHandler(Context context) {
         super(context, DATABASE_NAME, null, DATABASE_VERSION);

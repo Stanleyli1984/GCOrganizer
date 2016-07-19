@@ -1,8 +1,13 @@
 package com.example.stanl.gcorganizer;
 
 import android.content.Intent;
+import android.database.Cursor;
 import android.os.Bundle;
 import android.support.design.widget.FloatingActionButton;
+import android.support.v4.app.FragmentActivity;
+import android.support.v4.app.LoaderManager;
+import android.support.v4.content.CursorLoader;
+import android.support.v4.content.Loader;
 import android.support.v4.widget.SimpleCursorAdapter;
 import android.view.View;
 import android.support.design.widget.NavigationView;
@@ -17,26 +22,28 @@ import android.widget.AdapterView;
 import android.widget.EditText;
 import android.widget.ListView;
 import android.widget.AdapterView.OnItemClickListener;
+//import android.content.CursorLoader;
+//import android.content.Loader;
+//import android.app.LoaderManager;
+//import android.widget.SimpleCursorAdapter;
 
-import net.sqlcipher.Cursor;
+//import net.sqlcipher.Cursor;
 import net.sqlcipher.database.SQLiteDatabase;
 
 import java.util.List;
 
-public class MainActivity extends AppCompatActivity
-        implements NavigationView.OnNavigationItemSelectedListener {
+public class MainActivity extends FragmentActivity
+implements NavigationView.OnNavigationItemSelectedListener, LoaderManager.LoaderCallbacks<Cursor> {
     public final static String EXTRA_MESSAGE = "com.mycompany.myfirstapp.MESSAGE";
 
     private SimpleCursorAdapter dataAdapter;
-    private DBHandler dbHelper;
-
     @Override
     protected void onCreate(Bundle savedInstanceState) {
         super.onCreate(savedInstanceState);
         SQLiteDatabase.loadLibs(this);
         setContentView(R.layout.activity_main);
         Toolbar toolbar = (Toolbar) findViewById(R.id.toolbar);
-        setSupportActionBar(toolbar);
+        //setSupportActionBar(toolbar);
 
         FloatingActionButton fab = (FloatingActionButton) findViewById(R.id.fab);
 
@@ -64,7 +71,6 @@ public class MainActivity extends AppCompatActivity
 
         NavigationView navigationView = (NavigationView) findViewById(R.id.nav_view);
         navigationView.setNavigationItemSelectedListener(this);
-        dbHelper = new DBHandler(this);
         display_table();
     }
 
@@ -84,7 +90,7 @@ public class MainActivity extends AppCompatActivity
 
         dataAdapter = new SimpleCursorAdapter(
                 this, R.layout.dis_card_row_layout,
-                dbHelper.getAllCursor(),
+                null,
                 columns,
                 to,
                 0);
@@ -103,10 +109,42 @@ public class MainActivity extends AppCompatActivity
                 //        cursor.getString(cursor.getColumnIndexOrThrow("code"));
                 //Toast.makeText(getApplicationContext(),
                   //      countryCode, Toast.LENGTH_SHORT).show();
-
             }
         });
+        // Prepare the loader.  Either re-connect with an existing one,
+        // or start a new one.
+        getSupportLoaderManager().initLoader(0, null, this);
+    }
 
+    // TODO: pass in search args from here in future
+    @Override
+    public Loader<Cursor> onCreateLoader(int id, Bundle args) {
+        // This is called when a new Loader needs to be created.  This
+        // sample only has one Loader, so we don't care about the ID.
+        // First, pick the base URI to use depending on whether we are
+        // currently filtering.
+        CursorLoader tmp = new CursorLoader(this,
+                MyContentProvider.CONTENT_URI,
+                null,
+                null,
+                null,
+                null);
+        return tmp;
+    }
+
+    public void onLoaderReset(Loader<Cursor> loader) {
+        // This is called when the last Cursor provided to onLoadFinished()
+        // above is about to be closed.  We need to make sure we are no
+        // longer using it.
+        dataAdapter.swapCursor(null);
+    }
+
+    @Override
+    public void onLoadFinished(Loader<Cursor> loader, Cursor data) {
+        // Swap the new cursor in.  (The framework will take care of closing the
+        // old cursor once we return.)
+        dataAdapter.swapCursor(data);
+        // The list should now be shown.
     }
 
     @Override
