@@ -25,7 +25,7 @@ public class DBHandler extends SQLiteOpenHelper {
     public static final String CARD_NUMBER = "card_number";
     public static final String STORE_NAME = "store_name";
     public static final String STORE_ID = "store_id";
-    public static final String CARD_EXP_MONTH = "exp_month";
+    private static final String CARD_EXP_MONTH = "exp_month";
     public static final String CARD_EXP_YEAR = "exp_year";
     public static final String CARD_NOTE = "note";
     public static final String CARD_THUMB = "thumb";
@@ -60,19 +60,14 @@ public class DBHandler extends SQLiteOpenHelper {
         onCreate(db);
     }
 
-    public void insert(Card card) {
+    public void insert(ContentValues values) {
         SQLiteDatabase db = this.getWritableDatabase(PWD);
-
-        // TODO: use hibernate to implement
-        ContentValues values = new ContentValues();
         //for (Field field : card.getClass().getDeclaredFields()) {
         //    if (field.get(card) != null) {
         //        field.setAccessible(true); //Additional line
         //        values.put(field.getName(), field.get(card));
         //    }
         //}
-        values.put(CARD_NUMBER, card.card_number);
-        values.put(STORE_NAME, card.store_name);
         db.insert(TABLE_CARDS, null, values);
         db.close(); // Closing database connection
     }

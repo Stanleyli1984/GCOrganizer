@@ -33,8 +33,9 @@ public class MyContentProvider extends ContentProvider {
 
     @Override
     public Uri insert(Uri uri, ContentValues values) {
-        // TODO: Implement this to handle requests to insert a new row.
-        throw new UnsupportedOperationException("Not yet implemented");
+        dbhandler.insert(values);
+        // TODO: change
+        return null;
     }
 
     @Override
@@ -48,7 +49,11 @@ public class MyContentProvider extends ContentProvider {
     public Cursor query(Uri uri, String[] projection, String selection,
                         String[] selectionArgs, String sortOrder) {
         // TODO: Implement this to handle query requests from clients.
-        return dbhandler.getAllCursor();
+        switch (sUriMatcher.match(uri)) {
+            case CARDS:
+                return dbhandler.getAllCursor();
+        }
+        return null;
     }
 
     @Override

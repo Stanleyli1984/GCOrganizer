@@ -1,6 +1,8 @@
 package com.example.stanl.gcorganizer;
 
+import android.content.ContentValues;
 import android.content.Intent;
+import android.net.Uri;
 import android.os.Bundle;
 import android.support.design.widget.FloatingActionButton;
 import android.support.design.widget.Snackbar;
@@ -33,17 +35,13 @@ public class DisplayMessageActivity extends AppCompatActivity {
         Intent intent = getIntent();
         TextView textView = new TextView(this);
         textView.setTextSize(40);
+        ContentValues values = new ContentValues();
 
-        DBHandler dbhandler = new DBHandler(this);
-        Card card = new Card();
-        card.store_name = intent.getStringExtra("store_name");
-        card.card_number = intent.getStringExtra("card_number");
-        dbhandler.insert(card);
-        List<Card> all = dbhandler.list();
+        values.put(DBHandler.STORE_NAME, intent.getStringExtra("store_name"));
+        values.put(DBHandler.CARD_NUMBER, intent.getStringExtra("card_number"));
+        getContentResolver().insert(MyContentProvider.CONTENT_URI, values);
         textView.setText("Succeed!");
-
         RelativeLayout layout = (RelativeLayout) findViewById(R.id.content);
         layout.addView(textView);
     }
-
 }

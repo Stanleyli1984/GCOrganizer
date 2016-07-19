@@ -2,6 +2,7 @@ package com.example.stanl.gcorganizer;
 
 import android.content.Intent;
 import android.database.Cursor;
+import android.net.Uri;
 import android.os.Bundle;
 import android.support.design.widget.FloatingActionButton;
 import android.support.v4.app.FragmentActivity;
@@ -123,8 +124,12 @@ implements NavigationView.OnNavigationItemSelectedListener, LoaderManager.Loader
         // sample only has one Loader, so we don't care about the ID.
         // First, pick the base URI to use depending on whether we are
         // currently filtering.
+
+        Uri.Builder builder = new Uri.Builder();
+        builder.scheme("content").authority(MyContentProvider.AUTHORITY).appendPath("shops");
+
         CursorLoader tmp = new CursorLoader(this,
-                MyContentProvider.CONTENT_URI,
+                builder.build(),
                 null,
                 null,
                 null,
