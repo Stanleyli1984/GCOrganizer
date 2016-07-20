@@ -37,7 +37,7 @@
             android:theme="@style/AppTheme.NoActionBar" />
 
         <provider
-            android:name=".MyContentProvider"
+            android:name=".DBContentProvider"
             android:authorities="com.example.stanl.gcorganizer"
             android:enabled="true"
             android:exported="false" />

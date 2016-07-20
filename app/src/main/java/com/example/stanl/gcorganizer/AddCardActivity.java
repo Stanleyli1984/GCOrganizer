@@ -2,9 +2,8 @@ package com.example.stanl.gcorganizer;
 
 import android.content.ContentValues;
 import android.content.Intent;
+import android.net.Uri;
 import android.os.Bundle;
-import android.support.design.widget.FloatingActionButton;
-import android.support.design.widget.Snackbar;
 import android.support.v7.app.AppCompatActivity;
 import android.support.v7.widget.Toolbar;
 import android.view.View;
@@ -40,13 +39,17 @@ public class AddCardActivity extends AppCompatActivity {
 
         cardinfo_bundle = this.getIntent().getBundleExtra(EXTRA_MESSAGE);
         if (cardinfo_bundle != null) {
-            ((Button) findViewById(R.id.addbutton)).setText("Edit This Card");
+            ((Button) findViewById(R.id.addbutton)).setText(R.string.button_addnewcard);
+            ((Button) findViewById(R.id.updatebutton)).setText(R.string.button_updatecard);
+            ((Button) findViewById(R.id.deletebutton)).setText(R.string.button_deletecard);
             card = cardinfo_bundle.getParcelable("Card");
             ((EditText) card_number_view.findViewById(R.id.value)).setText(card.card_number);
             ((EditText) store_name_view.findViewById(R.id.value)).setText(card.store_name);
-            //setVisibility(View.GONE);
         }
         else {
+            findViewById(R.id.updatebutton).setVisibility(View.GONE);
+            findViewById(R.id.deletebutton).setVisibility(View.GONE);
+            ((Button) findViewById(R.id.deletebutton)).setText(R.string.button_deletecard);
             ((EditText) card_number_view.findViewById(R.id.value)).setHint(R.string.add_card_number);
             ((EditText) store_name_view.findViewById(R.id.value)).setHint(R.string.add_store_name);
         }
@@ -56,7 +59,7 @@ public class AddCardActivity extends AppCompatActivity {
         Intent intent = new Intent(this, MainActivity.class);
         Toast.makeText(getApplicationContext(), "Card Added!", Toast.LENGTH_LONG).show();
         ContentValues values = this.generate_content();
-        getContentResolver().insert(MyContentProvider.CONTENT_URI, values);
+        getContentResolver().insert(DBContentProvider.CONTENT_URI, values);
         startActivity(intent);
     }
 
@@ -64,8 +67,19 @@ public class AddCardActivity extends AppCompatActivity {
         Intent intent = new Intent(this, MainActivity.class);
         Toast.makeText(getApplicationContext(), "Card Updated!", Toast.LENGTH_LONG).show();
         ContentValues values = this.generate_content();
-        values.put(DBHandler.CARD_ID, card._id);
-        getContentResolver().update(MyContentProvider.CONTENT_URI, values, null, null);
+        Uri row_uri = DBContentProvider.CONTENT_URI.buildUpon().appendPath(String.valueOf(card._id)).build();
+        getContentResolver().update(row_uri, values, null, null);
+        startActivity(intent);
+    }
+
+
+    public void DeleteCard(View view) {
+        Intent intent = new Intent(this, MainActivity.class);
+        Toast.makeText(getApplicationContext(), "Card Deleted!", Toast.LENGTH_LONG).show();
+        ContentValues values = this.generate_content();
+        Uri row_uri = DBContentProvider.CONTENT_URI.buildUpon().appendPath(DBHandler.TABLE_CARDS).
+                appendPath(String.valueOf(card._id)).build();
+        getContentResolver().delete(row_uri, null, null);
         startActivity(intent);
     }
 

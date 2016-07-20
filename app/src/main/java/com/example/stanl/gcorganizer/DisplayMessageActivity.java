@@ -2,17 +2,13 @@ package com.example.stanl.gcorganizer;
 
 import android.content.ContentValues;
 import android.content.Intent;
-import android.net.Uri;
 import android.os.Bundle;
 import android.support.design.widget.FloatingActionButton;
 import android.support.design.widget.Snackbar;
 import android.support.v7.app.AppCompatActivity;
 import android.support.v7.widget.Toolbar;
 import android.view.View;
-import android.widget.RelativeLayout;
 import android.widget.TextView;
-
-import java.util.List;
 
 
 public class DisplayMessageActivity extends AppCompatActivity {
@@ -39,7 +35,7 @@ public class DisplayMessageActivity extends AppCompatActivity {
 
         values.put(DBHandler.STORE_NAME, intent.getStringExtra("store_name"));
         values.put(DBHandler.CARD_NUMBER, intent.getStringExtra("card_number"));
-        getContentResolver().insert(MyContentProvider.CONTENT_URI, values);
+        getContentResolver().insert(DBContentProvider.CONTENT_URI, values);
         textView.setText("Succeed!");
 //        RelativeLayout layout = (RelativeLayout) findViewById(R.id.content);
   //      layout.addView(textView);

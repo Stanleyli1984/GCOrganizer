@@ -1,12 +1,13 @@
 package com.example.stanl.gcorganizer;
 
 import android.content.ContentProvider;
+import android.content.ContentUris;
 import android.content.ContentValues;
 import android.content.UriMatcher;
 import android.database.Cursor;
 import android.net.Uri;
 
-public class MyContentProvider extends ContentProvider {
+public class DBContentProvider extends ContentProvider {
     private DBHandler dbhandler;
     private static final UriMatcher sUriMatcher;
     public static final String AUTHORITY = "com.example.stanl.gcorganizer";
@@ -14,14 +15,16 @@ public class MyContentProvider extends ContentProvider {
     private static final int CARDS = 1;
     private static final int CARDS_ID = 2;
 
-
-    public MyContentProvider() {
+    public DBContentProvider() {
     }
 
     @Override
     public int delete(Uri uri, String selection, String[] selectionArgs) {
-        // Implement this to handle requests to delete one or more rows.
-        throw new UnsupportedOperationException("Not yet implemented");
+        switch (sUriMatcher.match(uri)) {
+            case CARDS_ID:
+                dbhandler.delete(ContentUris.parseId(uri));
+        }
+        return 0;
     }
 
     @Override
@@ -59,7 +62,11 @@ public class MyContentProvider extends ContentProvider {
     @Override
     public int update(Uri uri, ContentValues values, String selection,
                       String[] selectionArgs) {
-        dbhandler.update(values);
+
+        switch (sUriMatcher.match(uri)) {
+            case CARDS_ID:
+                dbhandler.update(ContentUris.parseId(uri), values);
+        }
         return 0;
     }
 

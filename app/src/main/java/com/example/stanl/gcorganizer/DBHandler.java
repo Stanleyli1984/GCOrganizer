@@ -21,11 +21,11 @@ public class DBHandler extends SQLiteOpenHelper {
     // Contacts table name
     public static final String TABLE_CARDS = "shops";
     // Shops Table Columns names
-    public static final String CARD_ID = "_id";
+    public static final String KEY_ID = "_id";
     public static final String CARD_NUMBER = "card_number";
     public static final String STORE_NAME = "store_name";
     public static final String STORE_ID = "store_id";
-    private static final String CARD_EXP_MONTH = "exp_month";
+    public static final String CARD_EXP_MONTH = "exp_month";
     public static final String CARD_EXP_YEAR = "exp_year";
     public static final String CARD_NOTE = "note";
     public static final String CARD_THUMB = "thumb";
@@ -39,7 +39,7 @@ public class DBHandler extends SQLiteOpenHelper {
     @Override
     public void onCreate(SQLiteDatabase db) {
         String SQL_CREATE_ENTRIES = "CREATE TABLE " + TABLE_CARDS + "(" +
-                CARD_ID + " INTEGER PRIMARY KEY," +
+                KEY_ID + " INTEGER PRIMARY KEY," +
                 CARD_NUMBER + " TEXT," +
                 STORE_NAME + " TEXT," +
                 STORE_ID + " INTEGER" +
@@ -62,27 +62,22 @@ public class DBHandler extends SQLiteOpenHelper {
 
     public void insert(ContentValues values) {
         SQLiteDatabase db = this.getWritableDatabase(PWD);
-        //for (Field field : card.getClass().getDeclaredFields()) {
-        //    if (field.get(card) != null) {
-        //        field.setAccessible(true); //Additional line
-        //        values.put(field.getName(), field.get(card));
-        //    }
-        //}
         db.insert(TABLE_CARDS, null, values);
         db.close(); // Closing database connection
     }
 
-    public void update(ContentValues values) {
+    public void update(long _id, ContentValues values) {
         SQLiteDatabase db = this.getWritableDatabase(PWD);
-        //for (Field field : card.getClass().getDeclaredFields()) {
-        //    if (field.get(card) != null) {
-        //        field.setAccessible(true); //Additional line
-        //        values.put(field.getName(), field.get(card));
-        //    }
-        //}
-        db.update(TABLE_CARDS, values, CARD_ID + " = ?",
-                new String[] { String.valueOf(values.get(CARD_ID))});
+        db.update(TABLE_CARDS, values, KEY_ID + " = ?",
+                new String[] { String.valueOf(_id)});
         db.close(); // Closing database connection
+    }
+
+    public void delete(long _id) {
+        SQLiteDatabase db = this.getWritableDatabase(PWD);
+        db.delete(TABLE_CARDS, KEY_ID + " = ?",
+                new String[]{String.valueOf(_id)});
+        db.close();
     }
 
     public List<Card> list() {

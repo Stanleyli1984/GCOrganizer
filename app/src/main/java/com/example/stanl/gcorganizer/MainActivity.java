@@ -131,7 +131,7 @@ implements NavigationView.OnNavigationItemSelectedListener, LoaderManager.Loader
         // currently filtering.
 
         Uri.Builder builder = new Uri.Builder();
-        builder.scheme("content").authority(MyContentProvider.AUTHORITY).appendPath("shops");
+        builder.scheme("content").authority(DBContentProvider.AUTHORITY).appendPath("shops");
 
         return new CursorLoader(this,
                 builder.build(),
