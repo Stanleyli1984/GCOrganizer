@@ -14,6 +14,7 @@ public class DBContentProvider extends ContentProvider {
     public static final Uri CONTENT_URI = Uri.parse("content://" + AUTHORITY);
     private static final int CARDS = 1;
     private static final int CARDS_ID = 2;
+    private static final int CARDS_RAWQUERY = 3;
 
     public DBContentProvider() {
     }
@@ -55,6 +56,9 @@ public class DBContentProvider extends ContentProvider {
         switch (sUriMatcher.match(uri)) {
             case CARDS:
                 return dbhandler.getAllCursor();
+            // since I don;t want to implement a parcilable cursor class
+            case CARDS_RAWQUERY:
+                return dbhandler.rawQuery(selection, selectionArgs);
         }
         return null;
     }
@@ -74,5 +78,6 @@ public class DBContentProvider extends ContentProvider {
         sUriMatcher = new UriMatcher(UriMatcher.NO_MATCH);
         sUriMatcher.addURI(AUTHORITY, DBHandler.TABLE_CARDS, CARDS);
         sUriMatcher.addURI(AUTHORITY, DBHandler.TABLE_CARDS + "/#", CARDS_ID);
+        sUriMatcher.addURI(AUTHORITY, DBHandler.TABLE_CARDS + "/" + DBHandler.RAW_QUERY , CARDS_RAWQUERY);
     }
 }

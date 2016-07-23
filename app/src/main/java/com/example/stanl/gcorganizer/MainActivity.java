@@ -1,5 +1,6 @@
 package com.example.stanl.gcorganizer;
 
+import android.content.ContentResolver;
 import android.content.Intent;
 import android.database.Cursor;
 import android.net.Uri;
@@ -10,6 +11,8 @@ import android.support.v4.app.LoaderManager;
 import android.support.v4.content.CursorLoader;
 import android.support.v4.content.Loader;
 import android.support.v4.widget.SimpleCursorAdapter;
+import android.text.Editable;
+import android.text.TextWatcher;
 import android.view.View;
 import android.support.design.widget.NavigationView;
 import android.support.v4.view.GravityCompat;
@@ -35,6 +38,9 @@ implements NavigationView.OnNavigationItemSelectedListener, LoaderManager.Loader
     public final static String EXTRA_MESSAGE = "com.mycompany.myfirstapp.MESSAGE";
 
     private SimpleCursorAdapter dataAdapter;
+    private EditText filterText = null;
+    private static Uri db_uri;
+    private static Uri db_uri_raw_query;
     @Override
     protected void onCreate(Bundle savedInstanceState) {
         super.onCreate(savedInstanceState);
@@ -69,11 +75,45 @@ implements NavigationView.OnNavigationItemSelectedListener, LoaderManager.Loader
 
         NavigationView navigationView = (NavigationView) findViewById(R.id.nav_view);
         navigationView.setNavigationItemSelectedListener(this);
+
+        filterText = (EditText)findViewById(R.id.edit_message);
+        filterText.addTextChangedListener(filterTextWatcher);
+
         display_table();
     }
 
+    private TextWatcher filterTextWatcher = new TextWatcher() {
+
+        public void afterTextChanged(Editable s) {
+        }
+
+        public void beforeTextChanged(CharSequence s, int start, int count,
+                                      int after) {
+        }
+
+        public void onTextChanged(CharSequence s, int start, int before,
+                                  int count) {
+            //String whereClause = DBHandler.STORE_NAME + " LIKE ? OR " +
+            //        DBHandler.CARD_NUMBER + " LIKE ?";
+            //String[] whereArgs = new String[] {
+            //        "%" + s.toString() + "%",
+            //        "%" + s.toString() + "%"
+            //};
+
+            // "SELECT * FROM mytable WHERE REPLACE(username, ' ', '') LIKE '%TO_QUERY%' ;"
+            String rawClause = String.format("SELECT * FROM %1$s WHERE REPLACE(%2$s, ' ', '')" +
+                    " LIKE '%%%4$s%%' OR REPLACE(%3$s, ' ', '') LIKE '%%%4$s%%'",
+                    DBHandler.TABLE_CARDS, DBHandler.STORE_NAME, DBHandler.CARD_NUMBER,
+                    s.toString());
+            Cursor cur = getContentResolver().query(db_uri_raw_query, null, rawClause, null, null);
+            dataAdapter.changeCursor(cur);
+        }
+    };
+
     private void display_table() {
         ListView tl = (ListView) findViewById(R.id.main_table);
+        tl.setTextFilterEnabled(true);
+
         // Need to be the same as the column names in DB
         String[] columns = new String[] {
                 "card_number",
@@ -93,6 +133,21 @@ implements NavigationView.OnNavigationItemSelectedListener, LoaderManager.Loader
                 to,
                 0);
 
+        //dataAdapter.setFilterQueryProvider(new FilterQueryProvider() {
+        //    public Cursor runQuery(CharSequence constraint) {
+                //db_uri, projection, and sortOrder might be the same as previous
+                //but you might want a new selection, based on your filter content (constraint)
+                //String whereClause = DBHandler.STORE_NAME + " LIKE '%?%' OR " +
+                //        DBHandler.CARD_NUMBER + " LIKE '%?%'";
+                //String[] whereArgs = new String[] {
+                //        constraint.toString(),
+                //        constraint.toString()
+                //};
+                //Cursor cur = getContentResolver().query(db_uri, null, whereClause, whereArgs, null);
+                //dataAdapter.changeCursor(cur);
+                //return cur;
+            //}
+        //});
         tl.setAdapter(dataAdapter);
 
         tl.setOnItemClickListener(new OnItemClickListener() {
@@ -130,11 +185,8 @@ implements NavigationView.OnNavigationItemSelectedListener, LoaderManager.Loader
         // First, pick the base URI to use depending on whether we are
         // currently filtering.
 
-        Uri.Builder builder = new Uri.Builder();
-        builder.scheme("content").authority(DBContentProvider.AUTHORITY).appendPath("shops");
-
         return new CursorLoader(this,
-                builder.build(),
+                db_uri,
                 null,
                 null,
                 null,
@@ -220,4 +272,20 @@ implements NavigationView.OnNavigationItemSelectedListener, LoaderManager.Loader
         intent.putExtra(EXTRA_MESSAGE, message);
         startActivity(intent);
     }
+
+    @Override
+    protected void onDestroy() {
+        super.onDestroy();
+        filterText.removeTextChangedListener(filterTextWatcher);
+    }
+
+    static {
+        Uri.Builder builder = new Uri.Builder();
+        db_uri = builder.scheme("content").authority(DBContentProvider.AUTHORITY).
+                appendPath(DBHandler.TABLE_CARDS).build();
+        Uri.Builder builder1 = new Uri.Builder();
+        db_uri_raw_query = builder1.scheme("content").authority(DBContentProvider.AUTHORITY).
+                appendPath(DBHandler.TABLE_CARDS).appendPath(DBHandler.RAW_QUERY).build();
+    }
+
 }

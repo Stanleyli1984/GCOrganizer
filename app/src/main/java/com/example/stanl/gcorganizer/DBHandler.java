@@ -31,6 +31,7 @@ public class DBHandler extends SQLiteOpenHelper {
     public static final String CARD_THUMB = "thumb";
     public static final String CARD_PIC1 = "pic1";
     public static final String CARD_PIC2 = "pic2";
+    public static final String RAW_QUERY = "raw_query";
 
     public DBHandler(Context context) {
         super(context, DATABASE_NAME, null, DATABASE_VERSION);
@@ -78,6 +79,20 @@ public class DBHandler extends SQLiteOpenHelper {
         db.delete(TABLE_CARDS, KEY_ID + " = ?",
                 new String[]{String.valueOf(_id)});
         db.close();
+    }
+
+    public Cursor query_all_filed(String[] projection, String selection,
+                                  String[] selectionArgs, String sortOrder) {
+        SQLiteDatabase db = this.getReadableDatabase(PWD);
+        Cursor c = db.query(TABLE_CARDS, projection, selection, selectionArgs,
+                null, null, sortOrder);
+        return c;
+    }
+
+    public Cursor rawQuery(String sql, String[] selectionArgs) {
+        SQLiteDatabase db = this.getReadableDatabase(PWD);
+        Cursor c = db.rawQuery(sql, selectionArgs);
+        return c;
     }
 
     public List<Card> list() {
