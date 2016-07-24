@@ -3,6 +3,7 @@ package com.example.stanl.gcorganizer;
 import android.content.ContentResolver;
 import android.content.Intent;
 import android.database.Cursor;
+import android.graphics.Color;
 import android.net.Uri;
 import android.os.Bundle;
 import android.support.design.widget.FloatingActionButton;
@@ -12,7 +13,10 @@ import android.support.v4.content.CursorLoader;
 import android.support.v4.content.Loader;
 import android.support.v4.widget.SimpleCursorAdapter;
 import android.text.Editable;
+import android.text.SpannableString;
+import android.text.Spanned;
 import android.text.TextWatcher;
+import android.text.style.ForegroundColorSpan;
 import android.view.View;
 import android.support.design.widget.NavigationView;
 import android.support.v4.view.GravityCompat;
@@ -25,6 +29,7 @@ import android.widget.AdapterView;
 import android.widget.EditText;
 import android.widget.ListView;
 import android.widget.AdapterView.OnItemClickListener;
+import android.widget.TextView;
 //import android.content.CursorLoader;
 //import android.content.Loader;
 //import android.app.LoaderManager;
@@ -33,11 +38,15 @@ import android.widget.AdapterView.OnItemClickListener;
 //import net.sqlcipher.Cursor;
 import net.sqlcipher.database.SQLiteDatabase;
 
+import java.util.regex.Matcher;
+import java.util.regex.Pattern;
+
 public class MainActivity extends FragmentActivity
 implements NavigationView.OnNavigationItemSelectedListener, LoaderManager.LoaderCallbacks<Cursor> {
     public final static String EXTRA_MESSAGE = "com.mycompany.myfirstapp.MESSAGE";
 
     private SimpleCursorAdapter dataAdapter;
+    private String text_to_search;
     private EditText filterText = null;
     private static Uri db_uri;
     private static Uri db_uri_raw_query;
@@ -106,6 +115,7 @@ implements NavigationView.OnNavigationItemSelectedListener, LoaderManager.Loader
                     DBHandler.TABLE_CARDS, DBHandler.STORE_NAME, DBHandler.CARD_NUMBER,
                     s.toString());
             Cursor cur = getContentResolver().query(db_uri_raw_query, null, rawClause, null, null);
+            text_to_search = s.toString(); // IMO this is very unsafe. But let's use this method as of now
             dataAdapter.changeCursor(cur);
         }
     };
@@ -172,6 +182,53 @@ implements NavigationView.OnNavigationItemSelectedListener, LoaderManager.Loader
                   //      countryCode, Toast.LENGTH_SHORT).show();
             }
         });
+
+        dataAdapter.setViewBinder(new SimpleCursorAdapter.ViewBinder() {
+            @Override
+            public boolean setViewValue(View view, Cursor cursor, int column) {
+                if( column == cursor.getColumnIndex(DBHandler.CARD_NUMBER) ||
+                        column == cursor.getColumnIndex(DBHandler.STORE_NAME)){
+                    String cursorText = cursor.getString(column);
+                    TextView tv = (TextView) view;
+                    if ((text_to_search != null) && (!text_to_search.isEmpty())) {
+                        SpannableString spannableStringSearch = new SpannableString(cursorText);
+                        Pattern pattern = Pattern.compile(text_to_search,
+                                Pattern.CASE_INSENSITIVE);
+                        Matcher matcher = pattern.matcher(cursorText.replaceAll("\\s+", ""));
+                        if (matcher.find()) {
+                            //highlight all matching words in cursor with white background(since i have a colorfull background image)
+                            int start = matcher.start(), end = matcher.end();
+                            int spaces = 0;
+                            boolean found_start = false;
+                            for (int i = 0; i <= cursorText.length(); ++i) {
+                                if (i < cursorText.length()) {
+                                    if (cursorText.charAt(i) == ' ') {
+                                        ++spaces;
+                                    }
+                                }
+                                if (!found_start && spaces + start == i) {
+                                    start = i;
+                                    found_start = true;
+                                }
+                                if (spaces + end == i) {
+                                    end = i;
+                                    break;
+                                }
+                            }
+                            spannableStringSearch.setSpan(new ForegroundColorSpan(
+                                        Color.RED), start, end, Spanned.SPAN_EXCLUSIVE_EXCLUSIVE);
+                        }
+                        tv.setText(spannableStringSearch); // IMO this is very unsafe. But let's use it as of now
+                    }
+                    else {
+                        tv.setText(cursorText);
+                    }
+                    return true;
+                }
+                return false;
+            }
+        });
+
         // Prepare the loader.  Either re-connect with an existing one,
         // or start a new one.
         getSupportLoaderManager().initLoader(0, null, this);
